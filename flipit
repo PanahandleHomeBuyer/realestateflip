@@ -1,0 +1,48 @@
+import streamlit as st
+
+def calculate_flip(purchase_price, rehab_amount, arv, holding_costs, closing_reserves, profit_split_percentage):
+    loan_amount = purchase_price * 0.80
+    total_hard_money_loan = loan_amount + rehab_amount
+    points = total_hard_money_loan * 0.02
+    annual_interest = total_hard_money_loan * 0.12
+    monthly_interest = annual_interest / 12
+    total_holding_costs = holding_costs * 6
+    selling_commission = arv * 0.05
+    total_costs = purchase_price + rehab_amount + points + total_holding_costs + selling_commission
+    gross_profit = arv - total_costs
+    preferred_return = closing_reserves * 0.08
+    remaining_profit = gross_profit - preferred_return
+    private_money_partner_share = (profit_split_percentage / 100) * remaining_profit
+    managing_partner_share = (profit_split_percentage / 100) * remaining_profit
+    total_return_private_partner = preferred_return + private_money_partner_share
+    roi = (total_return_private_partner / closing_reserves) - 1
+    return {
+        'Total Hard Money Loan': total_hard_money_loan,
+        'Points': points,
+        'Annual Interest': annual_interest,
+        'Monthly Interest': monthly_interest,
+        'Total Holding Costs (6 months)': total_holding_costs,
+        'Selling Commission': selling_commission,
+        'Total Costs': total_costs,
+        'Gross Profit': gross_profit,
+        'Preferred Return': preferred_return,
+        'Remaining Profit': remaining_profit,
+        'Private Money Partner Share': private_money_partner_share,
+        'Managing Partner Share': managing_partner_share,
+        'Total Return to Private Money Partner': total_return_private_partner,
+        'ROI': roi
+    }
+
+st.title("Real Estate Flip Calculator")
+
+purchase_price = st.number_input("Purchase Price ($)", value=150000)
+rehab_amount = st.number_input("Rehab Amount ($)", value=60000)
+arv = st.number_input("After Repair Value (ARV) ($)", value=320000)
+holding_costs = st.number_input("Monthly Holding Costs ($)", value=1500)
+closing_reserves = st.number_input("Closing Reserves/Cash Needed ($)", value=10000)
+profit_split_percentage = st.number_input("Profit Split Percentage (%)", value=50)
+
+if st.button("Calculate"):
+    results = calculate_flip(purchase_price, rehab_amount, arv, holding_costs, closing_reserves, profit_split_percentage)
+    for key, value in results.items():
+        st.write(f"{key}: ${value:,.2f}" if isinstance(value, (int, float)) else f"{key}: {value*100:.2f}%")
